@@ -2,38 +2,27 @@
 
 #include <ESP8266WiFi.h>
 #include <ESPAsyncWebSrv.h>
-//#include <ESP8266mDNS.h>
 #include <Task.h>
 
-#include "robo.hpp"
 #include "robo_state.hpp"
 #include "robo_configuration.hpp"
 #include "robo_log.hpp"
 
 namespace robo {
 
-static const char *wifi_name = "iPhone"; //"robotzone";
-static const char *wifi_pass = "kekkeroni"; //robotzone";
-//static const char *mdns_name = "martoaga";
+static const char *wifi_name = "robotzone";
+static const char *wifi_pass = "robotzone";
 
 class WebTask : public Task {
 public:
   WebTask() : Task(),
-    server(80),
-    sse("/sse") {}
-  
-  void broadcastSSE(String message) {
-    if(online) {
-      sse.send(message.c_str(), NULL, millis(), 200);
-    }
-  }
+    server(80) {}
 
 private:
   bool online = false;
   AsyncWebServer server;
-  AsyncEventSource sse;
 
-protected:
+public:
   void setup() {
     LOG("web", "Hello!");
 
@@ -89,28 +78,11 @@ protected:
       req->send(res);
     });
 
-    // Server-Sent events :)
-    sse.onConnect([](AsyncEventSourceClient *client){
-      client->send("hello!",NULL,millis(),1000);
-    });
-    server.addHandler(&sse);
-
     server.begin();
     online = true;
   }
 
   void loop() {
-    // Broadcast state at 10Hz
-    for(int i = 0; i < num_state_items; i++) { // There has to be a better more encapsulated way to do this but i'm in a hurry
-      String buf;
-      if(state_items[i].type == state_item::INT) {
-        buf = "state " + state_items[i].name + " " + *((int*)state_items[i].addr);
-      } else if(state_items[i].type == state_item::FLOAT) {
-        buf = "state " + state_items[i].name + " " + *((float*)state_items[i].addr);
-      }
-      broadcastSSE(buf);
-    }
-    delay(100);
   }
 };
 

@@ -2,7 +2,6 @@
 
 #include <LeanTask.h>
 
-#include "robo.hpp"
 #include "robo_configuration.hpp"
 #include "robo_state.hpp"
 #include "robo_kinematics.hpp"
@@ -21,12 +20,13 @@ public:
 private:
   String cmd;
 
-protected:
+public:
   void setup() {
 	  LOG("robo_serial", "Hello!");
   }
 
   void loop() {
+    if(!shouldRun()) return;
     static String cmd;
     static bool got_line = false;
     while(Serial.available()) {

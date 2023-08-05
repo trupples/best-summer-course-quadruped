@@ -17,7 +17,6 @@ void setup() {
 
   Scheduler.start(&robo::serialTask);
   Scheduler.start(&robo::kinematicsTask);
-  //Scheduler.start(&robo::animationTask); TODO WEEKEND
   Scheduler.start(&robo::webTask);
 
   Scheduler.begin();

@@ -183,10 +183,10 @@ class KinematicsTask : public LeanTask {
 public:
   KinematicsTask() :
     LeanTask(true, 20), // Run kinematics loop at 50Hz <-> in sync with the servos
-    leg_fl("fl", 5, 4),
-    leg_fr("fr", 0, 2),
-    leg_bl("bl", 13, 15),
-    leg_br("br",  0, 16),
+    leg_fl("fl",  9, 13),
+    leg_fr("fr", 10, 15),
+    leg_bl("bl",  0, 14),
+    leg_br("br",  2, 12),
     legs { &leg_fl, &leg_fr, &leg_bl, &leg_br }
   {}
 
@@ -200,7 +200,7 @@ private:
 
   Pose pose;
 
-protected:
+public:
   void setup() {
     LOG("kinematics", "Hello!");
     state((int*)&kinematics_state, "state");
@@ -214,6 +214,7 @@ protected:
   }
 
   void loop() {
+    if(!shouldRun()) return;
     if(kinematics_state == MANUAL_FK) {
       for(int i = 0; i < 4; i++) {
         legs[i]->hip.write(legs[i]->hip.angle);
